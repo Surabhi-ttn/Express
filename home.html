@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        header{
+            background-color: aqua;
+            
+        }
+        ul {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+        li {
+            list-style: none;
+        }
+        a {
+            text-decoration: none;
+        }
+        
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="./home.html">Home</a></li>
+                <li><a href="./add_user.html">Add User</a></li>
+                <li><a href="./about.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section>
+        <table>
+            <thead>
+                <tr>
+                    <th>name</th>
+                    <th>age</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="parent">
+                <!-- <tr>
+                    <td><button onclick="deleteUser()">Delete</button></td>
+                </tr> -->
+            </tbody>
+        </table>
+    </section>
+    <script>
+        let data = [];
+        window.onload = () => {
+            var requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+            };
+
+            fetch("http://localhost:5000/get_users", requestOptions)
+            .then(response => response.json())
+            .then(result => {
+                console.log(result)
+                data = result;
+                for(let i in result) {
+                    var tr = document.createElement("tr");
+                    var tdage = document.createElement("td");
+                    var tdname = document.createElement("td");
+                    var tdDelete = document.createElement("td");
+                    var button = document.createElement("button");
+                    button.id = i;
+                    button.onclick = () => onDelete(i);
+                    button.textContent = "Delete";
+                    tdage.textContent = result[i].age;
+                    tdname.textContent = result[i].name;
+                    tdDelete.appendChild(button);
+                    tr.appendChild(tdname);
+                    tr.appendChild(tdage);
+                    tr.appendChild(tdDelete);
+                    document.getElementById("parent").appendChild(tr);
+                }
+            })
+            .catch(error => console.log('error', error));
+        }
+
+        function onDelete(id) {
+            console.log(id)
+            var myHeaders = new Headers();
+            myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+
+            var urlencoded = new URLSearchParams();
+            urlencoded.append("name", data[id].name);
+
+            var requestOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: urlencoded,
+            redirect: 'follow'
+            };
+
+            fetch("http://localhost:5000/delete_user", requestOptions)
+            .then(response => response.json())
+            .then(result => {console.log(result);
+                location.reload();})
+            .catch(error => console.log('error', error));
+            
+        }
+    </script>
+</body>
+</html>
